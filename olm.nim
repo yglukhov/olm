@@ -213,223 +213,144 @@ proc generateOneTimeKeys*(a: Account, numberOfKeys: csize_t, random: pointer, ra
 ## discarded. Returns olm_error() on error. If the number of random bytes is
 ## too small then olm_account_last_error() will be "NOT_ENOUGH_RANDOM".
 
-# ## The number of random bytes needed to generate a fallback key.
-# size_t olm_account_generate_fallback_key_random_length(
-#     OlmAccount * account
-# );
+proc generateFallbackKeyRandomLength*(a: Account): csize_t {.importc: "olm_account_generate_fallback_key_random_length".}
+## The number of random bytes needed to generate a fallback key.
 
-# ## Generates a new fallback key. Only one previous fallback key is
-# ## stored. Returns olm_error() on error. If the number of random bytes is too
-# ## small then olm_account_last_error() will be "NOT_ENOUGH_RANDOM".
-# size_t olm_account_generate_fallback_key(
-#     OlmAccount * account,
-#     void * random, size_t random_length
-# );
+proc generateFallbackKey*(a: Account, random: pointer, random_length: csize_t): csize_t {.importc: "olm_account_generate_fallback_key".}
+## Generates a new fallback key. Only one previous fallback key is
+## stored. Returns olm_error() on error. If the number of random bytes is too
+## small then olm_account_last_error() will be "NOT_ENOUGH_RANDOM".
 
-# ## The number of bytes needed to hold the fallback key as returned by
-# ## olm_account_fallback_key.
-# size_t olm_account_fallback_key_length(
-#     OlmAccount * account
-# );
+proc fallbackKeyLength*(a: Account): csize_t {.importc: "olm_account_fallback_key_length".}
+## The number of bytes needed to hold the fallback key as returned by
+## olm_account_fallback_key.
 
-# size_t olm_account_fallback_key(
-#     OlmAccount * account,
-#     void * fallback_key, size_t fallback_key_size
-# );
+proc fallbackKey*(a: Account, fallback_key: pointer, fallback_key_size: csize_t): csize_t {.importc: "olm_account_fallback_key".}
 
+proc createOutboundSessionRandomLength*(s: Session): csize_t {.importc: "olm_create_outbound_session_random_length".}
+## The number of random bytes needed to create an outbound session
 
-# ## The number of random bytes needed to create an outbound session
-# size_t olm_create_outbound_session_random_length(
-#     OlmSession * session
-# );
+proc createOutboundSession*(s: Session, a: Account, their_identity_key: pointer, their_identity_key_length: csize_t, their_one_time_key: pointer, their_one_time_key_length: csize_t, random: pointer, random_length: csize_t): csize_t {.importc: "olm_create_outbound_session".}
+## Creates a new out-bound session for sending messages to a given identity_key
+## and one_time_key. Returns olm_error() on failure. If the keys couldn't be
+## decoded as base64 then olm_session_last_error() will be "INVALID_BASE64"
+## If there weren't enough random bytes then olm_session_last_error() will
+## be "NOT_ENOUGH_RANDOM".
 
-# ## Creates a new out-bound session for sending messages to a given identity_key
-# ## and one_time_key. Returns olm_error() on failure. If the keys couldn't be
-# ## decoded as base64 then olm_session_last_error() will be "INVALID_BASE64"
-# ## If there weren't enough random bytes then olm_session_last_error() will
-# ## be "NOT_ENOUGH_RANDOM".
-# size_t olm_create_outbound_session(
-#     OlmSession * session,
-#     OlmAccount * account,
-#     void const * their_identity_key, size_t their_identity_key_length,
-#     void const * their_one_time_key, size_t their_one_time_key_length,
-#     void * random, size_t random_length
-# );
+proc createInboundSession*(s: Session, a: Account, one_time_key_message: pointer, message_length: csize_t): csize_t {.importc: "olm_create_inbound_session".}
+## Create a new in-bound session for sending/receiving messages from an
+## incoming PRE_KEY message. Returns olm_error() on failure. If the base64
+## couldn't be decoded then olm_session_last_error will be "INVALID_BASE64".
+## If the message was for an unsupported protocol version then
+## olm_session_last_error() will be "BAD_MESSAGE_VERSION". If the message
+## couldn't be decoded then then olm_session_last_error() will be
+## "BAD_MESSAGE_FORMAT". If the message refers to an unknown one time
+## key then olm_session_last_error() will be "BAD_MESSAGE_KEY_ID".
 
-# ## Create a new in-bound session for sending/receiving messages from an
-# ## incoming PRE_KEY message. Returns olm_error() on failure. If the base64
-# ## couldn't be decoded then olm_session_last_error will be "INVALID_BASE64".
-# ## If the message was for an unsupported protocol version then
-# ## olm_session_last_error() will be "BAD_MESSAGE_VERSION". If the message
-# ## couldn't be decoded then then olm_session_last_error() will be
-# ## "BAD_MESSAGE_FORMAT". If the message refers to an unknown one time
-# ## key then olm_session_last_error() will be "BAD_MESSAGE_KEY_ID".
-# size_t olm_create_inbound_session(
-#     OlmSession * session,
-#     OlmAccount * account,
-#     void * one_time_key_message, size_t message_length
-# );
+proc createInboundSessionFrom*(s: Session, a: Account, their_identity_key: pointer, their_identity_key_length: csize_t, one_time_key_message: pointer, message_length: csize_t): csize_t {.importc: "olm_create_inbound_session_from".}
+## Create a new in-bound session for sending/receiving messages from an
+## incoming PRE_KEY message. Returns olm_error() on failure. If the base64
+## couldn't be decoded then olm_session_last_error will be "INVALID_BASE64".
+## If the message was for an unsupported protocol version then
+## olm_session_last_error() will be "BAD_MESSAGE_VERSION". If the message
+## couldn't be decoded then then olm_session_last_error() will be
+## "BAD_MESSAGE_FORMAT". If the message refers to an unknown one time
+## key then olm_session_last_error() will be "BAD_MESSAGE_KEY_ID".
 
-# ## Create a new in-bound session for sending/receiving messages from an
-# ## incoming PRE_KEY message. Returns olm_error() on failure. If the base64
-# ## couldn't be decoded then olm_session_last_error will be "INVALID_BASE64".
-# ## If the message was for an unsupported protocol version then
-# ## olm_session_last_error() will be "BAD_MESSAGE_VERSION". If the message
-# ## couldn't be decoded then then olm_session_last_error() will be
-# ## "BAD_MESSAGE_FORMAT". If the message refers to an unknown one time
-# ## key then olm_session_last_error() will be "BAD_MESSAGE_KEY_ID".
-# size_t olm_create_inbound_session_from(
-#     OlmSession * session,
-#     OlmAccount * account,
-#     void const * their_identity_key, size_t their_identity_key_length,
-#     void * one_time_key_message, size_t message_length
-# );
+## The length of the buffer needed to return the id for this session.
+proc idLength*(s: Session): csize_t {.importc: "olm_session_id_length".}
 
-# ## The length of the buffer needed to return the id for this session.
-# size_t olm_session_id_length(
-#     OlmSession * session
-# );
+proc id*(s: Session, id: pointer, id_length: csize_t): csize_t {.importc: "olm_session_id".}
+## An identifier for this session. Will be the same for both ends of the
+## conversation. If the id buffer is too small then olm_session_last_error()
+## will be "OUTPUT_BUFFER_TOO_SMALL".
 
-# ## An identifier for this session. Will be the same for both ends of the
-# ## conversation. If the id buffer is too small then olm_session_last_error()
-# ## will be "OUTPUT_BUFFER_TOO_SMALL".
-# size_t olm_session_id(
-#     OlmSession * session,
-#     void * id, size_t id_length
-# );
+proc hasReceivedMessage*(s: Session): cint {.importc: "olm_session_has_received_message".}
 
-# int olm_session_has_received_message(
-#     OlmSession *session
-# );
+proc describe*(s: Session, buf: cstring, buflen: csize_t) {.importc: "olm_session_describe".}
+## Write a null-terminated string describing the internal state of an olm
+## session to the buffer provided for debugging and logging purposes.
 
-# ##
-# ## Write a null-terminated string describing the internal state of an olm
-# ## session to the buffer provided for debugging and logging purposes.
+proc matchesInboundSession*(s: Session, one_time_key_message: pointer, message_length: csize_t): csize_t {.importc: "olm_matches_inbound_session".}
+## Checks if the PRE_KEY message is for this in-bound session. This can happen
+## if multiple messages are sent to this account before this account sends a
+## message in reply. The one_time_key_message buffer is destroyed. Returns 1 if
+## the session matches. Returns 0 if the session does not match. Returns
+## olm_error() on failure. If the base64 couldn't be decoded then
+## olm_session_last_error will be "INVALID_BASE64".  If the message was for an
+## unsupported protocol version then olm_session_last_error() will be
+## "BAD_MESSAGE_VERSION". If the message couldn't be decoded then then
+## olm_session_last_error() will be "BAD_MESSAGE_FORMAT".
 
-# void olm_session_describe(OlmSession * session, char *buf, size_t buflen);
+proc matchesInboundSessionFrom*(s: Session, their_identity_key: pointer, their_identity_key_length: csize_t, one_time_key_message: pointer, message_length: csize_t): csize_t {.importc: "olm_matches_inbound_session_from".}
+## Checks if the PRE_KEY message is for this in-bound session. This can happen
+## if multiple messages are sent to this account before this account sends a
+## message in reply. The one_time_key_message buffer is destroyed. Returns 1 if
+## the session matches. Returns 0 if the session does not match. Returns
+## olm_error() on failure. If the base64 couldn't be decoded then
+## olm_session_last_error will be "INVALID_BASE64".  If the message was for an
+## unsupported protocol version then olm_session_last_error() will be
+## "BAD_MESSAGE_VERSION". If the message couldn't be decoded then then
+## olm_session_last_error() will be "BAD_MESSAGE_FORMAT".
 
-# ## Checks if the PRE_KEY message is for this in-bound session. This can happen
-# ## if multiple messages are sent to this account before this account sends a
-# ## message in reply. The one_time_key_message buffer is destroyed. Returns 1 if
-# ## the session matches. Returns 0 if the session does not match. Returns
-# ## olm_error() on failure. If the base64 couldn't be decoded then
-# ## olm_session_last_error will be "INVALID_BASE64".  If the message was for an
-# ## unsupported protocol version then olm_session_last_error() will be
-# ## "BAD_MESSAGE_VERSION". If the message couldn't be decoded then then
-# ## olm_session_last_error() will be "BAD_MESSAGE_FORMAT".
-# size_t olm_matches_inbound_session(
-#     OlmSession * session,
-#     void * one_time_key_message, size_t message_length
-# );
+proc removeOneTimeKeys*(a: Account, s: Session): csize_t {.importc: "olm_remove_one_time_keys".}
+## Removes the one time keys that the session used from the account. Returns
+## olm_error() on failure. If the account doesn't have any matching one time
+## keys then olm_account_last_error() will be "BAD_MESSAGE_KEY_ID".
 
-# ## Checks if the PRE_KEY message is for this in-bound session. This can happen
-# ## if multiple messages are sent to this account before this account sends a
-# ## message in reply. The one_time_key_message buffer is destroyed. Returns 1 if
-# ## the session matches. Returns 0 if the session does not match. Returns
-# ## olm_error() on failure. If the base64 couldn't be decoded then
-# ## olm_session_last_error will be "INVALID_BASE64".  If the message was for an
-# ## unsupported protocol version then olm_session_last_error() will be
-# ## "BAD_MESSAGE_VERSION". If the message couldn't be decoded then then
-# ## olm_session_last_error() will be "BAD_MESSAGE_FORMAT".
-# size_t olm_matches_inbound_session_from(
-#     OlmSession * session,
-#     void const * their_identity_key, size_t their_identity_key_length,
-#     void * one_time_key_message, size_t message_length
-# );
+proc encryptMessageType*(s: Session): csize_t {.importc: "olm_encrypt_message_type".}
+## The type of the next message that olm_encrypt() will return. Returns
+## OLM_MESSAGE_TYPE_PRE_KEY if the message will be a PRE_KEY message.
+## Returns OLM_MESSAGE_TYPE_MESSAGE if the message will be a normal message.
+## Returns olm_error on failure.
 
-# ## Removes the one time keys that the session used from the account. Returns
-# ## olm_error() on failure. If the account doesn't have any matching one time
-# ## keys then olm_account_last_error() will be "BAD_MESSAGE_KEY_ID".
-# size_t olm_remove_one_time_keys(
-#     OlmAccount * account,
-#     OlmSession * session
-# );
+proc encryptRandomLength*(s: Session): csize_t {.importc: "olm_encrypt_random_length".}
+## The number of random bytes needed to encrypt the next message.
 
-# ## The type of the next message that olm_encrypt() will return. Returns
-# ## OLM_MESSAGE_TYPE_PRE_KEY if the message will be a PRE_KEY message.
-# ## Returns OLM_MESSAGE_TYPE_MESSAGE if the message will be a normal message.
-# ## Returns olm_error on failure.
-# size_t olm_encrypt_message_type(
-#     OlmSession * session
-# );
+proc encryptMessageLength*(s: Session, plaintext_length: csize_t): csize_t {.importc: "olm_encrypt_message_length".}
+## The size of the next message in bytes for the given number of plain-text
+## bytes.
 
-# ## The number of random bytes needed to encrypt the next message.
-# size_t olm_encrypt_random_length(
-#     OlmSession * session
-# );
+proc encrypt*(s: Session, plaintext: pointer, plaintext_length: csize_t, random: pointer, random_length: csize_t, message: pointer, message_length: csize_t): csize_t {.importc: "olm_encrypt".}
+## Encrypts a message using the session. Returns the length of the message in
+## bytes on success. Writes the message as base64 into the message buffer.
+## Returns olm_error() on failure. If the message buffer is too small then
+## olm_session_last_error() will be "OUTPUT_BUFFER_TOO_SMALL". If there
+## weren't enough random bytes then olm_session_last_error() will be
+## "NOT_ENOUGH_RANDOM".
 
-# ## The size of the next message in bytes for the given number of plain-text
-# ## bytes.
-# size_t olm_encrypt_message_length(
-#     OlmSession * session,
-#     size_t plaintext_length
-# );
+proc decryptMaxPlaintextLength*(s: Session, message_type: csize_t, message: pointer, message_length: csize_t): csize_t {.importc: "olm_decrypt_max_plaintext_length".}
+## The maximum number of bytes of plain-text a given message could decode to.
+## The actual size could be different due to padding. The input message buffer
+## is destroyed. Returns olm_error() on failure. If the message base64
+## couldn't be decoded then olm_session_last_error() will be
+## "INVALID_BASE64". If the message is for an unsupported version of the
+## protocol then olm_session_last_error() will be "BAD_MESSAGE_VERSION".
+## If the message couldn't be decoded then olm_session_last_error() will be
+## "BAD_MESSAGE_FORMAT".
 
-# ## Encrypts a message using the session. Returns the length of the message in
-# ## bytes on success. Writes the message as base64 into the message buffer.
-# ## Returns olm_error() on failure. If the message buffer is too small then
-# ## olm_session_last_error() will be "OUTPUT_BUFFER_TOO_SMALL". If there
-# ## weren't enough random bytes then olm_session_last_error() will be
-# ## "NOT_ENOUGH_RANDOM".
-# size_t olm_encrypt(
-#     OlmSession * session,
-#     void const * plaintext, size_t plaintext_length,
-#     void * random, size_t random_length,
-#     void * message, size_t message_length
-# );
+proc decrypt*(s: Session, message_type: csize_t, message: pointer, message_length: csize_t, plaintext: pointer, max_plaintext_length: csize_t): csize_t {.importc: "olm_decrypt"}
+## Decrypts a message using the session. The input message buffer is destroyed.
+## Returns the length of the plain-text on success. Returns olm_error() on
+## failure. If the plain-text buffer is smaller than
+## olm_decrypt_max_plaintext_length() then olm_session_last_error()
+## will be "OUTPUT_BUFFER_TOO_SMALL". If the base64 couldn't be decoded then
+## olm_session_last_error() will be "INVALID_BASE64". If the message is for
+## an unsupported version of the protocol then olm_session_last_error() will
+## be "BAD_MESSAGE_VERSION". If the message couldn't be decoded then
+## olm_session_last_error() will be BAD_MESSAGE_FORMAT".
+## If the MAC on the message was invalid then olm_session_last_error() will
+## be "BAD_MESSAGE_MAC".
 
-# ## The maximum number of bytes of plain-text a given message could decode to.
-# ## The actual size could be different due to padding. The input message buffer
-# ## is destroyed. Returns olm_error() on failure. If the message base64
-# ## couldn't be decoded then olm_session_last_error() will be
-# ## "INVALID_BASE64". If the message is for an unsupported version of the
-# ## protocol then olm_session_last_error() will be "BAD_MESSAGE_VERSION".
-# ## If the message couldn't be decoded then olm_session_last_error() will be
-# ## "BAD_MESSAGE_FORMAT".
-# size_t olm_decrypt_max_plaintext_length(
-#     OlmSession * session,
-#     size_t message_type,
-#     void * message, size_t message_length
-# );
+proc sha256_length*(u: Utility): csize_t {.importc: "olm_sha256_length".}
+## The length of the buffer needed to hold the SHA-256 hash.
 
-# ## Decrypts a message using the session. The input message buffer is destroyed.
-# ## Returns the length of the plain-text on success. Returns olm_error() on
-# ## failure. If the plain-text buffer is smaller than
-# ## olm_decrypt_max_plaintext_length() then olm_session_last_error()
-# ## will be "OUTPUT_BUFFER_TOO_SMALL". If the base64 couldn't be decoded then
-# ## olm_session_last_error() will be "INVALID_BASE64". If the message is for
-# ## an unsupported version of the protocol then olm_session_last_error() will
-# ## be "BAD_MESSAGE_VERSION". If the message couldn't be decoded then
-# ## olm_session_last_error() will be BAD_MESSAGE_FORMAT".
-# ## If the MAC on the message was invalid then olm_session_last_error() will
-# ## be "BAD_MESSAGE_MAC".
-# size_t olm_decrypt(
-#     OlmSession * session,
-#     size_t message_type,
-#     void * message, size_t message_length,
-#     void * plaintext, size_t max_plaintext_length
-# );
+proc sha256*(u: Utility, input: pointer, input_length: csize_t, output: pointer, output_length: csize_t): csize_t {.importc: "olm_sha256".}
+## Calculates the SHA-256 hash of the input and encodes it as base64. If the
+## output buffer is smaller than olm_sha256_length() then
+## olm_utility_last_error() will be "OUTPUT_BUFFER_TOO_SMALL".
 
-# ## The length of the buffer needed to hold the SHA-256 hash.
-# size_t olm_sha256_length(
-#    OlmUtility * utility
-# );
-
-# ## Calculates the SHA-256 hash of the input and encodes it as base64. If the
-# ## output buffer is smaller than olm_sha256_length() then
-# ## olm_utility_last_error() will be "OUTPUT_BUFFER_TOO_SMALL".
-# size_t olm_sha256(
-#     OlmUtility * utility,
-#     void const * input, size_t input_length,
-#     void * output, size_t output_length
-# );
-
-# ## Verify an ed25519 signature. If the key was too small then
-# ## olm_utility_last_error() will be "INVALID_BASE64". If the signature was invalid
-# ## then olm_utility_last_error() will be "BAD_MESSAGE_MAC".
-# size_t olm_ed25519_verify(
-#     OlmUtility * utility,
-#     void const * key, size_t key_length,
-#     void const * message, size_t message_length,
-#     void * signature, size_t signature_length
-# );
+proc ed25519Verify*(u: Utility, key: pointer, key_length: csize_t, message: pointer, message_length: csize_t, signature: pointer, signature_length: csize_t): csize_t {.importc: "olm_ed25519_verify".}
+## Verify an ed25519 signature. If the key was too small then
+## olm_utility_last_error() will be "INVALID_BASE64". If the signature was invalid
+## then olm_utility_last_error() will be "BAD_MESSAGE_MAC".
